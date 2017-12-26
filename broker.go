@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/lager"
-	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pivotal-cf/brokerapi"
 )
 
@@ -74,7 +73,6 @@ var catalog = []brokerapi.Service{
 
 type DeployerAccountBroker struct {
 	uaaClient        AuthClient
-	cfClient         PAASClient
 	generatePassword PasswordGenerator
 	logger           lager.Logger
 	config           Config
@@ -117,11 +115,6 @@ func (b *DeployerAccountBroker) Deprovision(
 			return brokerapi.DeprovisionServiceSpec{}, err
 		}
 
-		err = b.cfClient.DeleteUser(user.ID)
-		if err != nil {
-			return brokerapi.DeprovisionServiceSpec{}, err
-		}
-
 		err = b.uaaClient.DeleteUser(user.ID)
 		if err != nil {
 			return brokerapi.DeprovisionServiceSpec{}, err
@@ -161,50 +154,6 @@ func (b *DeployerAccountBroker) Bind(
 				"client_secret": password,
 			},
 		}, nil
-	case userAccountGUID:
-		instance, err := b.cfClient.ServiceInstanceByGuid(instanceID)
-		if err != nil {
-			return brokerapi.Binding{}, err
-		}
-
-		space, err := b.cfClient.GetSpaceByGuid(instance.SpaceGuid)
-		if err != nil {
-			return brokerapi.Binding{}, err
-		}
-
-		user, err := b.provisionUser(bindingID, password)
-		if err != nil {
-			return brokerapi.Binding{}, err
-		}
-		_, err = b.cfClient.CreateUser(cfclient.UserRequest{Guid: user.ID})
-		if err != nil {
-			return brokerapi.Binding{}, err
-		}
-
-		_, err = b.cfClient.AssociateOrgUserByUsername(space.OrganizationGuid, user.UserName)
-		if err != nil {
-			return brokerapi.Binding{}, err
-		}
-
-		switch details.PlanID {
-		case deployerGUID:
-			_, err = b.cfClient.AssociateSpaceDeveloperByUsername(instance.SpaceGuid, user.UserName)
-			if err != nil {
-				return brokerapi.Binding{}, err
-			}
-		case auditorGUID:
-			_, err = b.cfClient.AssociateSpaceAuditorByUsername(instance.SpaceGuid, user.UserName)
-			if err != nil {
-				return brokerapi.Binding{}, err
-			}
-		}
-
-		return brokerapi.Binding{
-			Credentials: map[string]string{
-				"username": bindingID,
-				"password": password,
-			},
-		}, nil
 	default:
 		return brokerapi.Binding{}, fmt.Errorf("Service ID %s not found", details.ServiceID)
 	}
@@ -224,11 +173,6 @@ func (b *DeployerAccountBroker) Unbind(
 		}
 	case userAccountGUID:
 		user, err := b.uaaClient.GetUser(bindingID)
-		if err != nil {
-			return err
-		}
-
-		err = b.cfClient.DeleteUser(user.ID)
 		if err != nil {
 			return err
 		}

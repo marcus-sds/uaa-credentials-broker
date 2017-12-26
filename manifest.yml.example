@@ -3,15 +3,15 @@ applications:
 - name: uaa-credentials-broker
   command: uaa-credentials-broker
   buildpack: go_buildpack
-  memory: 1G
+  memory: 512M
   instances: 1
   env:
     GOVERSION: go1.8
-    UAA_ADDRESS: https://uaa-app.test.devground.io
+    UAA_ADDRESS: https://uaa-app.((system_domain))
     UAA_CLIENT_ID: admin
-    UAA_CLIENT_SECRET: 8jfgkd56x7ye54nlct98
+    UAA_CLIENT_SECRET: ((uaa_admin_client_secret))
     UAA_ZONE: uaa
-    CF_ADDRESS: https://uaa-app.test.devground.io
+    CF_ADDRESS: https://uaa-app((system_domain))
     BROKER_USERNAME: broker
-    BROKER_PASSWORD: broker
+    BROKER_PASSWORD: ((broker_password))
     EMAIL_ADDRESS: admin@devground.io

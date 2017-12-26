@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/lager"
-	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pivotal-cf/brokerapi"
 
@@ -53,15 +52,6 @@ func main() {
 
 	client := NewClient(config)
 
-	cfClient, err := cfclient.NewClient(&cfclient.Config{
-		ApiAddress:   config.CFAddress,
-		ClientID:     config.UAAClientID,
-		ClientSecret: config.UAAClientSecret,
-	})
-	if err != nil {
-		log.Fatalf("", err)
-	}
-
 	broker := DeployerAccountBroker{
 		logger: logger,
 		uaaClient: &UAAClient{
@@ -70,7 +60,6 @@ func main() {
 			zone:     config.UAAZone,
 			client:   client,
 		},
-		cfClient:         cfClient,
 		generatePassword: GenerateSecurePassword,
 		config:           config,
 	}
