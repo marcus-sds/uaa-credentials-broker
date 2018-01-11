@@ -48,27 +48,6 @@ var catalog = []brokerapi.Service{
 			DocumentationUrl: "https://cloud.gov/docs/services/cloud-gov-identity-provider/",
 		},
 	},
-	{
-		ID:          userAccountGUID,
-		Name:        "cloud-gov-service-account",
-		Description: "Manage cloud.gov service accounts with access to your organization",
-		Bindable:    true,
-		Plans: []brokerapi.ServicePlan{
-			{
-				ID:          deployerGUID,
-				Name:        "space-deployer",
-				Description: "A service account for continuous deployment, limited to a single space",
-			},
-			{
-				ID:          auditorGUID,
-				Name:        "space-auditor",
-				Description: "A service account for auditing configuration and monitoring events limited to a single space",
-			},
-		},
-		Metadata: &brokerapi.ServiceMetadata{
-			DocumentationUrl: "https://cloud.gov/docs/services/cloud-gov-service-account/",
-		},
-	},
 }
 
 type DeployerAccountBroker struct {

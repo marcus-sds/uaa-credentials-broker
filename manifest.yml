@@ -9,7 +9,7 @@ applications:
     GOVERSION: go1.8
     UAA_ADDRESS: https://uaa-app.test.devground.io
     UAA_CLIENT_ID: admin
-    UAA_CLIENT_SECRET: 8jfgkd56x7ye54nlct98
+    UAA_CLIENT_SECRET: adminsecret
     UAA_ZONE: uaa
     CF_ADDRESS: https://uaa-app.test.devground.io
     BROKER_USERNAME: broker
